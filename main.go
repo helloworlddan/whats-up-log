@@ -24,9 +24,6 @@ func main() {
 	// Say hi when the server starts listening
 	run.Noticef(nil, "Hi 🦫 Let's start the service '%s' in project '%s'", run.Name(), run.ProjectID())
 
-	// Drop some useful info when debugging
-	run.Debugf(nil, "I am running in region '%s'", run.Region())
-
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// Let's log in some different severities
 		run.Default(r, "I got called!")
@@ -37,6 +34,9 @@ func main() {
 		run.Critical(r, "I got called!")
 		run.Alert(r, "I got called!")
 		run.Emergency(r, "I got called!")
+
+		// Drop some useful info when debugging usxing a type formatter
+		run.Debugf(nil, "I am running in region '%s'", run.Region())
 
 		fmt.Fprintln(w, "What's up log? 🪵")
 	})
