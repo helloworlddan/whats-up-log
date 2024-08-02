@@ -2,7 +2,7 @@ module github.com/NucleusEngineering/whats-up-log
 
 go 1.22.4
 
-require github.com/helloworlddan/run v0.6.5
+require github.com/helloworlddan/run v0.6.8
 
 require (
 	github.com/blendle/zapdriver v1.3.1 // indirect
