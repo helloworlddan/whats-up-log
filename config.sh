@@ -4,4 +4,4 @@ source $HOME/.bash_profile
 
 guser admin@stamer.altostrat.com
 gproject stamer-showcase
-gregion europe-west10
+gregion europe-north1
