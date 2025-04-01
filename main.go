@@ -22,7 +22,12 @@ import (
 
 func main() {
 	// Say hi when the server starts listening
-	run.Noticef(nil, "Hi 🦫 Let's start the service '%s' in project '%s'", run.Name(), run.ProjectID())
+	run.Noticef(
+		nil,
+		"Hi 🦫 Let's start the service '%s' in project '%s'",
+		run.Name(),
+		run.ProjectID(),
+	)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// Let's log in some different severities
@@ -35,8 +40,15 @@ func main() {
 		run.Alert(r, "I got called!")
 		run.Emergency(r, "I got called!")
 
-		// Drop some useful info when debugging usxing a type formatter
+		// Drop some useful info when debugging using a type formatter
 		run.Debugf(nil, "I am running in region '%s'", run.Region())
+
+		// Print all incoming headers
+		for name, values := range r.Header {
+			for _, value := range values {
+				run.Debugf(r, "[HEADER] '%s': '%s'", name, value)
+			}
+		}
 
 		fmt.Fprintln(w, "What's up log? 🪵")
 	})
