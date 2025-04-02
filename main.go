@@ -39,6 +39,7 @@ func main() {
 		run.ProjectID(),
 	)
 
+	// Init first context for server lifetime
 	ctx := context.Background()
 
 	// Instantiate clients early and eagerly
@@ -66,7 +67,7 @@ func main() {
 	)
 	tracer := provider.Tracer(run.Name())
 
-	// Logging severities
+	// NOTE: Handler: Logging severities
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// Let's log in some different severities
 		run.Default(r, "I got called!")
@@ -91,8 +92,7 @@ func main() {
 		fmt.Fprintln(w, "What's up log? 🪵")
 	})
 
-	// Propagation among services
-	// NOTE: might need otelhttp
+	// NOTE: Handler: Propagation among services
 	http.HandleFunc("/service-to-service", func(w http.ResponseWriter, r *http.Request) {
 		run.Debug(r, "I am calling someone else!")
 
@@ -104,6 +104,10 @@ func main() {
 			return
 		}
 
+		// Let's be explicit
+		req.Header.Add("X-Cloud-Trace-Context", r.Header.Get("X-Cloud-Trace-Context"))
+		req.Header.Add("Traceparent", r.Header.Get("Traceparent"))
+
 		resp, err := httpClient.Do(req)
 		if err != nil {
 			run.Error(r, err)
@@ -114,7 +118,7 @@ func main() {
 		fmt.Fprintln(w, resp.Status)
 	})
 
-	// Propagation to *.googleapis.com
+	// NOTE: Handler: Propagation to *.googleapis.com
 	http.HandleFunc("/google-service", func(w http.ResponseWriter, r *http.Request) {
 		run.Debug(r, "I am calling Cloud Storage!")
 
@@ -133,7 +137,7 @@ func main() {
 		}
 	})
 
-	// With OTEL instrumentation
+	// NOTE: Handler: With OTEL instrumentation
 	http.HandleFunc("/otel-instrumentation", func(w http.ResponseWriter, r *http.Request) {
 		run.Debug(r, "I am doing some work!")
 
@@ -158,6 +162,7 @@ func main() {
 		fmt.Fprintln(w, "work completed")
 	})
 
+	// Boot server
 	err = run.ServeHTTP(func(_ context.Context) {
 		// Catch SIGTERM and say goodbye after shutdown
 		gsClient.Close()
